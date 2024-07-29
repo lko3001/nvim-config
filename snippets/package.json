@@ -11,6 +11,15 @@
           "scss"
         ],
         "path": "./css.json"
+      },
+      {
+        "language": [
+          "javascript",
+          "typescript",
+          "javascriptreact",
+          "typescriptreact"
+        ],
+        "path": "./js.json"
       }
     ]
   }
