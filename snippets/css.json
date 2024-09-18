@@ -1,0 +1,49 @@
+{
+  "setup": {
+    "prefix": "setup",
+    "body": [
+      "* {",
+      "box-sizing: border-box;",
+      "padding: 0;",
+      "margin: 0;",
+      "}",
+      "",
+      ""
+    ],
+    "description": "Base setup"
+  },
+  "flex-direction: column": {
+    "prefix": "fdc",
+    "body": ["flex-direction: column;", ""],
+    "description": "flex-direction: column"
+  },
+  "width: 100%": {
+    "prefix": "wf",
+    "body": ["width: 100%;", ""],
+    "description": "width: 100%"
+  },
+  "height: 100%": {
+    "prefix": "hf",
+    "body": ["height: 100%;", ""],
+    "description": "height: 100%"
+  },
+  "background-color: transparent": {
+    "prefix": "bgt",
+    "body": ["background-color: transparent;", ""],
+    "description": "background-color: transparent"
+  },
+  "place-items: center": {
+    "prefix": "pic",
+    "body": ["place-items: center;", ""],
+    "description": "place-items: center"
+  },
+  "grid-template-columns: repeat(auto-fit|fill, minmax(...))": {
+    "prefix": "gtcfit",
+    "body": [
+      "grid-template-columns: repeat(auto-${1|fit,fill|}, minmax(${2}, 1fr));",
+      "grid-template-columns: repeat(auto-${1|fit,fill|}, minmax(min(${2}, 100%), 1fr));",
+      ""
+    ],
+    "description": "grid-template-columns: repeat(auto-fit, minmax(...))"
+  }
+}
