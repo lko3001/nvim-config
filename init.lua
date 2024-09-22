@@ -51,7 +51,8 @@ vim.keymap.set('n', '<C-CR>', function()
   if vim.bo.filetype == 'python' then
     command = 'python3'
   elseif vim.bo.filetype == 'sh' then
-    command = 'bash'
+    vim.cmd 'FloatermNew --autoclose=0 bash %'
+    return
   elseif vim.bo.filetype == 'c' then
     vim.cmd 'FloatermNew --autoclose=0 gcc % -o %< && ./%<'
     return
@@ -766,12 +767,30 @@ require('lazy').setup({
       vim.g.gruvbox_material_enable_italic = true
       vim.g.gruvbox_material_foreground = 'original'
       vim.g.gruvbox_material_background = 'hard'
-      vim.cmd.colorscheme 'gruvbox-material'
+      -- vim.cmd.colorscheme 'gruvbox-material'
+    end,
+  },
+  {
+    'ribru17/bamboo.nvim',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      require('bamboo').setup {}
+      require('bamboo').load()
     end,
   },
   { 'mikesmithgh/gruvsquirrel.nvim' },
   { 'fcpg/vim-fahrenheit', lazy = false },
   { 'voldikss/vim-floaterm' },
+  {
+    'iamcco/markdown-preview.nvim',
+    cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
+    build = 'cd app && yarn install',
+    init = function()
+      vim.g.mkdp_filetypes = { 'markdown' }
+    end,
+    ft = { 'markdown' },
+  },
   -- PLUGINS
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
@@ -817,3 +836,8 @@ require('lazy').setup({
     },
   },
 })
+
+local util = require 'bamboo.util'
+local bamboo_colors = require 'bamboo.colors'
+local darker_bg = util.darken(bamboo_colors.bg0, 0.250)
+vim.api.nvim_set_hl(0, 'NormalFloat', { bg = darker_bg })
