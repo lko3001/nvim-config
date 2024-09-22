@@ -45,3 +45,34 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.highlight.on_yank()
   end,
 })
+
+vim.api.nvim_create_user_command('Run', function()
+  local command = ''
+  --
+  if vim.bo.filetype == 'python' then
+    command = 'python3'
+  elseif vim.bo.filetype == 'sh' then
+    vim.cmd 'FloatermNew --autoclose=0 bash %'
+    return
+  elseif vim.bo.filetype == 'c' then
+    vim.cmd 'FloatermNew --autoclose=0 gcc % -o %< && ./%<'
+    return
+  else
+    print 'Filetype not supported'
+    return
+  end
+
+  vim.api.nvim_command 'w'
+  vim.api.nvim_command('!' .. command .. ' %')
+end, { desc = 'Run current file' })
+
+vim.api.nvim_create_user_command('MDNDocs', function()
+  vim.cmd 'normal! hl' -- to make sure to close the popup
+  vim.cmd 'normal K' -- open it
+  vim.cmd 'normal K' -- go inside of it
+  vim.defer_fn(function()
+    vim.cmd 'normal! G$h'
+    vim.cmd 'normal gx'
+    vim.cmd 'normal q'
+  end, 50)
+end, { desc = 'Open MDN Docs' })
