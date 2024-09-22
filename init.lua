@@ -52,6 +52,9 @@ vim.keymap.set('n', '<C-CR>', function()
     command = 'python3'
   elseif vim.bo.filetype == 'sh' then
     command = 'bash'
+  elseif vim.bo.filetype == 'c' then
+    vim.cmd 'FloatermNew --autoclose=0 gcc % -o %< && ./%<'
+    return
   else
     print 'Filetype not supported'
     return
@@ -136,7 +139,7 @@ require('lazy').setup({
   {
     'folke/which-key.nvim',
     event = 'VimEnter',
-    enabled = false,
+    enabled = true,
     config = function()
       require('which-key').setup()
 
@@ -170,6 +173,9 @@ require('lazy').setup({
     },
     config = function()
       require('telescope').setup {
+        defaults = {
+          file_ignore_patterns = { 'node_modules', 'vendor' },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -526,12 +532,14 @@ require('lazy').setup({
         json = { 'prettierd', 'prettier' },
         vue = { 'prettierd', 'prettier' },
         php = { 'ecs', 'easy-coding-standard' },
+        c = { 'clang-format' },
       },
     },
   },
 
   {
     'Exafunction/codeium.vim',
+    enabled = false,
     dependencies = {
       'nvim-lua/plenary.nvim',
       'hrsh7th/nvim-cmp',
@@ -756,9 +764,14 @@ require('lazy').setup({
     priority = 1000,
     config = function()
       vim.g.gruvbox_material_enable_italic = true
+      vim.g.gruvbox_material_foreground = 'original'
+      vim.g.gruvbox_material_background = 'hard'
       vim.cmd.colorscheme 'gruvbox-material'
     end,
   },
+  { 'mikesmithgh/gruvsquirrel.nvim' },
+  { 'fcpg/vim-fahrenheit', lazy = false },
+  { 'voldikss/vim-floaterm' },
   -- PLUGINS
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the

@@ -45,5 +45,15 @@
       ""
     ],
     "description": "grid-template-columns: repeat(auto-fit, minmax(...))"
+  },
+  "border-radius: 9999px": {
+    "prefix": "brf",
+    "body": ["border-radius: 9999px;", ""],
+    "description": "border-radius: infinite;"
+  },
+  "width: fit-content": {
+    "prefix": "wfit",
+    "body": ["width: fit-content;", ""],
+    "description": "width: fit-content;"
   }
 }
