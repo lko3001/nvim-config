@@ -3,5 +3,10 @@
     "prefix": "fun",
     "body": ["function ${1}() {", "\t${2}", "}"],
     "description": "Function setup"
+  },
+  "console.log": {
+    "prefix": "clg",
+    "body": ["console.log(${1})"],
+    "description": "Console log"
   }
 }

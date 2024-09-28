@@ -14,6 +14,19 @@
       },
       {
         "language": [
+          "php",
+          "html"
+        ],
+        "path": "./html.json"
+      },
+      {
+        "language": [
+          "php"
+        ],
+        "path": "./php.json"
+      },
+      {
+        "language": [
           "javascript",
           "typescript",
           "javascriptreact",

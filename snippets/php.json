@@ -1,0 +1,16 @@
+{
+  "template": {
+    "prefix": "Template",
+    "body": [
+      "<?",
+      "/* Template name: ${1} */",
+      "get_header();",
+      "?>",
+      "",
+      "${2}",
+      "",
+      "<? get_footer() ?>"
+    ],
+    "description": "create rows"
+  }
+}

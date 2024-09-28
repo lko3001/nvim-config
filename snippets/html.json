@@ -1,0 +1,22 @@
+{
+  ".columns": {
+    "prefix": ".columns",
+    "body": [
+      "<div class='columns'>",
+      "\t<div class='column left'>${1}</div>",
+      "\t<div class='column right'>${2}</div>",
+      "</div>"
+    ],
+    "description": "create columns"
+  },
+  ".rows": {
+    "prefix": ".rows",
+    "body": [
+      "<div class='rows'>",
+      "\t<div class='row top'>${1}</div>",
+      "\t<div class='row bottom'>${2}</div>",
+      "</div>"
+    ],
+    "description": "create rows"
+  }
+}

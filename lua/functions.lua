@@ -9,6 +9,10 @@ vim.api.nvim_create_user_command('Layout', function()
   vim.api.nvim_command 'resize +20'
 end, {})
 
+vim.api.nvim_create_user_command('Lazygit', function()
+  vim.cmd 'FloatermNew --autoclose=0 --height=0.9 --width=0.9 lazygit'
+end, {})
+
 vim.api.nvim_create_user_command('UploadToFTP', function()
   -- Get the current file path from Neovim
   local filename = vim.fn.expand '%' -- Gets the relative path of the current file
@@ -51,6 +55,9 @@ vim.api.nvim_create_user_command('Run', function()
   --
   if vim.bo.filetype == 'python' then
     command = 'python3'
+  elseif vim.bo.filetype == 'javascript' then
+    vim.cmd 'FloatermNew --autoclose=0 node %'
+    return
   elseif vim.bo.filetype == 'sh' then
     vim.cmd 'FloatermNew --autoclose=0 bash %'
     return

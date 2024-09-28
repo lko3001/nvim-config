@@ -55,5 +55,16 @@
     "prefix": "wfit",
     "body": ["width: fit-content;", ""],
     "description": "width: fit-content;"
+  },
+  "border-radius: :D": {
+    "prefix": "borr",
+    "body": ["border-radius: ${1};", ""],
+    "description": "border-radius: :D"
+  },
+  "@media query": {
+    "prefix": "media",
+    "body": ["@media only screen and (max-width: 768px) {", "\t${1}", "}"],
+    "description": "@Media query"
   }
+
 }
