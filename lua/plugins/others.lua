@@ -87,4 +87,7 @@ return {
     end,
     ft = { 'markdown' },
   },
+  {
+    'amadeus/vim-convert-color-to',
+  },
 }

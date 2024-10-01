@@ -54,7 +54,7 @@ vim.api.nvim_create_user_command('Run', function()
   local command = ''
   --
   if vim.bo.filetype == 'python' then
-    command = 'python3'
+    vim.cmd 'FloatermNew --autoclose=0 py %'
   elseif vim.bo.filetype == 'javascript' then
     vim.cmd 'FloatermNew --autoclose=0 node %'
     return
