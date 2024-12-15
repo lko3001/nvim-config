@@ -51,27 +51,31 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 vim.api.nvim_create_user_command('Run', function()
-  local command = ''
-  --
-  if vim.bo.filetype == 'python' then
-    vim.cmd 'FloatermNew --autoclose=0 py %'
-  elseif vim.bo.filetype == 'javascript' then
-    vim.cmd 'FloatermNew --autoclose=0 node %'
-    return
-  elseif vim.bo.filetype == 'sh' then
-    vim.cmd 'FloatermNew --autoclose=0 bash %'
-    return
-  elseif vim.bo.filetype == 'c' then
-    vim.cmd 'FloatermNew --autoclose=0 gcc % -o %< && ./%<'
-    return
-  else
-    print 'Filetype not supported'
+  -- Check if buffer is writable
+  if vim.bo.buftype ~= '' then
+    print 'Cannot run: current buffer is not writable'
     return
   end
 
-  vim.api.nvim_command 'w'
-  vim.api.nvim_command('!' .. command .. ' %')
-end, { desc = 'Run current file' })
+  -- Save the file first if modified
+  if vim.bo.modified then
+    vim.cmd 'write'
+  end
+
+  if vim.bo.filetype == 'python' then
+    vim.cmd 'FloatermNew --autoclose=0 python3 %'
+  elseif vim.bo.filetype == 'javascript' then
+    vim.cmd 'FloatermNew --autoclose=0 node %'
+  elseif vim.bo.filetype == 'typescript' then
+    vim.cmd 'FloatermNew --autoclose=0 tsc % && node %:r.js'
+  elseif vim.bo.filetype == 'sh' then
+    vim.cmd 'FloatermNew --autoclose=0 bash %'
+  elseif vim.bo.filetype == 'c' then
+    vim.cmd 'FloatermNew --autoclose=0 gcc % -o %< && ./%<'
+  else
+    print 'Filetype not supported'
+  end
+end, {})
 
 vim.api.nvim_create_user_command('MDNDocs', function()
   vim.cmd 'normal! hl' -- to make sure to close the popup
@@ -83,3 +87,19 @@ vim.api.nvim_create_user_command('MDNDocs', function()
     vim.cmd 'normal q'
   end, 50)
 end, { desc = 'Open MDN Docs' })
+
+function GenerateFontSizeSnippet(first_number, second_number, third_number)
+  -- Start building the output string
+  local output = '.fs-' .. first_number .. '\n'
+  output = output .. '/* ' .. first_number .. ' ' .. second_number .. ' */\n'
+  output = output .. 'font-size: ' .. first_number .. 'rem;\n'
+  output = output .. 'line-height: ' .. (second_number / first_number) .. ';\n'
+
+  -- Check if the third parameter is provided
+  if third_number then
+    output = output .. 'letter-spacing: ' .. third_number .. ';\n'
+  end
+
+  -- Print the output in Neovim's command line
+  print(output)
+end

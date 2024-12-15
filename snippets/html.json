@@ -18,5 +18,14 @@
       "</div>"
     ],
     "description": "create rows"
+  },
+  "texts": {
+    "prefix": ".text",
+    "body": [
+      "<div class='text'>",
+      "\t<div class='text-wrapper'>${1}</div>",
+      "</div>"
+    ],
+    "description": "create text and text wrapper"
   }
 }

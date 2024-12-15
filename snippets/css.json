@@ -17,6 +17,11 @@
     "body": ["flex-direction: column;", ""],
     "description": "flex-direction: column"
   },
+  "flex-direction: column-reverse": {
+    "prefix": "fdcr",
+    "body": ["flex-direction: column-reverse;", ""],
+    "description": "flex-direction: column-reverse"
+  },
   "width: 100%": {
     "prefix": "wf",
     "body": ["width: 100%;", ""],
@@ -40,8 +45,9 @@
   "grid-template-columns: repeat(auto-fit|fill, minmax(...))": {
     "prefix": "gtcfit",
     "body": [
-      "grid-template-columns: repeat(auto-${1|fit,fill|}, minmax(${2}, 1fr));",
-      "grid-template-columns: repeat(auto-${1|fit,fill|}, minmax(min(${2}, 100%), 1fr));",
+      "--grid-item-width: ${2}",
+      "grid-template-columns: repeat(auto-${1|fit,fill|}, minmax(var(--grid-item-width), 1fr));",
+      "grid-template-columns: repeat(auto-${1|fit,fill|}, minmax(min(var(--grid-item-width), 100%), 1fr));",
       ""
     ],
     "description": "grid-template-columns: repeat(auto-fit, minmax(...))"
@@ -65,6 +71,15 @@
     "prefix": "media",
     "body": ["@media only screen and (max-width: 768px) {", "\t${1}", "}"],
     "description": "@Media query"
+  },
+  "flex-wrap: wrap": {
+    "prefix": "fww",
+    "body": ["flex-wrap: wrap;", ""],
+    "description": "flex-wrap: wrap"
+  },
+  "margin: 0 auto;": {
+    "prefix": "m0a",
+    "body": ["margin: 0 auto;", ""],
+    "description": "margin: 0 auto;"
   }
-
 }

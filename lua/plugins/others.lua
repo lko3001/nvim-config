@@ -22,7 +22,7 @@ return {
   {
     'folke/which-key.nvim',
     event = 'VimEnter',
-    enabled = true,
+    enabled = false,
     config = function()
       require('which-key').setup()
 
@@ -53,10 +53,23 @@ return {
   },
   {
     'kylechui/nvim-surround',
-    version = '*', -- Use for stability; omit to use `main` branch for the latest features
+    version = '*',
     event = 'VeryLazy',
     config = function()
-      require('nvim-surround').setup {}
+      require('nvim-surround').setup {
+        surrounds = {
+          ['p'] = {
+            add = { '<?php echo ', ' ?>' },
+            find = '<%?php echo .- %?>',
+            delete = '^(<%?php echo)().-(%?>)()$',
+          },
+          ['g'] = {
+            add = { 'get_field("', '")' },
+            find = 'get_field%(".-"%)',
+            delete = '^(get_field%(")().-("%))()$',
+          },
+        },
+      }
     end,
   },
   {
@@ -89,5 +102,11 @@ return {
   },
   {
     'amadeus/vim-convert-color-to',
+  },
+  {
+    'andrew-george/telescope-themes',
+    config = function()
+      require('telescope').load_extension 'themes'
+    end,
   },
 }

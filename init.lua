@@ -2,7 +2,6 @@ vim.opt.rtp:prepend(vim.fn.stdpath 'data' .. '/lazy/lazy.nvim')
 
 require 'options'
 require 'mappings'
-require 'functions'
 
 require('lazy').setup({
   require 'plugins.ide',
@@ -33,3 +32,5 @@ require('lazy').setup({
     },
   },
 })
+
+require 'functions'
