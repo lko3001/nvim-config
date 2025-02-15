@@ -1,5 +1,5 @@
 {
-  ".columns": {
+ ".columns": {
     "prefix": ".columns",
     "body": [
       "<div class='columns'>",
@@ -28,14 +28,14 @@
     ],
     "description": "create text and text wrapper"
   },
-  "layers": {
+  "texts": {
     "prefix": ".layers",
     "body": [
-      "<div class=\"layers\">",
-      "\t<div class=\"layer layer-bg\"></div>",
-      "\t<div class=\"layer layer-fg\"></div>",
+      "<div class='layers'>",
+      "\t<div class='layer layer-bg'>${1}</div>",
+      "\t<div class='layer layer-fg'>${2}</div>",
       "</div>"
     ],
-    "description": "create layers"
+    "description": "create 2 layers"
   }
 }

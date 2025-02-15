@@ -8,17 +8,14 @@
       {
         "language": [
           "css",
-          "scss",
-          "astro"
+          "scss"
         ],
         "path": "./css.json"
       },
       {
         "language": [
           "php",
-          "javascript",
-          "html",
-          "astro"
+          "html"
         ],
         "path": "./html.json"
       },
@@ -33,8 +30,7 @@
           "javascript",
           "typescript",
           "javascriptreact",
-          "typescriptreact",
-          "astro"
+          "typescriptreact"
         ],
         "path": "./js.json"
       }
