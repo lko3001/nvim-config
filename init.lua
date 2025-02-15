@@ -29,6 +29,8 @@ vim.keymap.set("n", "gh", vim.diagnostic.open_float, { desc = "Open diagnostic f
 vim.keymap.set("n", "<leader>cn", vim.cmd.cnext)
 vim.keymap.set("n", "<leader>cp", vim.cmd.cprevious)
 vim.keymap.set("n", "<C-CR>", vim.cmd.Run)
+vim.keymap.set('t', '<leader>t', vim.cmd.FloatermToggle, { desc = 'Toggle Flaterminal' })
+vim.keymap.set('n', '<leader>t', vim.cmd.FloatermToggle, { desc = 'Toggle Flaterminal' })
 
 -- NOTE: FUNCTIONS
 
@@ -83,7 +85,7 @@ vim.api.nvim_create_user_command("FontGenerator", function(details)
 
   local lines = {}
 
-  table.insert(lines, ".fs-" .. font_size_px .. "{")
+  table.insert(lines, ".fs-" .. font_size_px .. " {")
 
   table.insert(lines, "\t font-size: " .. font_size_px / 16 .. "rem;")
 
@@ -593,6 +595,7 @@ require("lazy").setup({
       dependencies = { "nvim-lua/plenary.nvim" },
       opts = { signs = false },
     },
+    { 'voldikss/vim-floaterm' },
   },
   install = {},
   checker = { enabled = true },
