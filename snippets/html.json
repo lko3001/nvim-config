@@ -27,5 +27,15 @@
       "</div>"
     ],
     "description": "create text and text wrapper"
+  },
+  "layers": {
+    "prefix": ".layers",
+    "body": [
+      "<div class=\"layers\">",
+      "\t<div class=\"layer layer-bg\"></div>",
+      "\t<div class=\"layer layer-fg\"></div>",
+      "</div>"
+    ],
+    "description": "create layers"
   }
 }

@@ -72,6 +72,8 @@ vim.api.nvim_create_user_command('Run', function()
     vim.cmd 'FloatermNew --autoclose=0 bash %'
   elseif vim.bo.filetype == 'c' then
     vim.cmd 'FloatermNew --autoclose=0 gcc % -o %< && ./%<'
+  elseif vim.bo.filetype == 'pug' then
+    vim.cmd 'silent !pug %'
   else
     print 'Filetype not supported'
   end
@@ -103,3 +105,8 @@ function GenerateFontSizeSnippet(first_number, second_number, third_number)
   -- Print the output in Neovim's command line
   print(output)
 end
+
+vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
+  pattern = '*.hbs',
+  command = 'set filetype=html',
+})
