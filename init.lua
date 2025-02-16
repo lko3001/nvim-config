@@ -116,10 +116,11 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 
 local formatters = {
   lua = { "stylua", stop_after_first = true },
-  html = { "prettierd", stop_after_first = true },
+  html = { "superhtml", stop_after_first = true },
   css = { "prettierd", stop_after_first = true },
   javascript = { "prettierd", stop_after_first = true },
   typescript = { "prettierd", stop_after_first = true },
+  json = { "prettierd", stop_after_first = true },
 }
 
 local custom_surrounds = {
@@ -138,6 +139,24 @@ local custom_surrounds = {
 local lsp_servers = {
   ts_ls = {},
   cssls = {},
+  html = {},
+  superhtml = {},
+  emmet_language_server = {
+    filetypes = {
+      'html',
+      'typescriptreact',
+      'javascriptreact',
+      'javascript',
+      'php',
+      'typescript',
+      'javascript.jsx',
+      'typescript.tsx',
+      'css',
+      'scss',
+      'astro',
+    },
+  },
+  tailwindcss = {},
   intelephense = {
     root_dir = function()
       return vim.fn.getcwd()
@@ -234,14 +253,27 @@ local lsp_servers = {
       },
     },
   },
-  tailwindcss = {},
   lua_ls = {
     settings = {
       Lua = {
+        runtime = {
+          -- Tell the language server which version of Lua you're using
+          version = "LuaJIT",
+        },
         diagnostics = {
-          globals = { "vim" },
+          globals = { "vim", "Snacks" },
+        },
+        -- Make the server aware of Neovim runtime files
+        workspace = {
+          library = vim.api.nvim_get_runtime_file("", true),
+          checkThirdParty = true,
+        },
+        -- Tell the language server about the neovim API
+        completion = {
+          callSnippet = "Replace",
         },
       },
+
     },
   },
 }
@@ -307,58 +339,29 @@ require("lazy").setup({
       lazy = false,
     },
     {
-      "nvim-telescope/telescope.nvim",
-      event = "VimEnter",
-      branch = "0.1.x",
-      dependencies = {
-        "nvim-lua/plenary.nvim",
-        {
-          "nvim-telescope/telescope-fzf-native.nvim",
-          build = "make",
-          cond = function()
-            return vim.fn.executable("make") == 1
-          end,
-        },
-        { "nvim-telescope/telescope-ui-select.nvim" },
-        { "nvim-tree/nvim-web-devicons",            enabled = vim.g.have_nerd_font },
+      "folke/snacks.nvim",
+      opts = {
+        picker = {
+        }
       },
-      config = function()
-        require("telescope").setup({
-          defaults = {
-            file_ignore_patterns = { "node_modules", "vendor", "dist", "build" },
-          },
-          extensions = {
-            ["ui-select"] = {
-              require("telescope.themes").get_dropdown(),
-            },
-          },
-        })
-
-        pcall(require("telescope").load_extension, "fzf")
-        pcall(require("telescope").load_extension, "ui-select")
-
-        local builtin = require("telescope.builtin")
-        vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
-        vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" })
-        vim.keymap.set("n", "<leader>sf", builtin.find_files, { desc = "[S]earch [F]iles" })
-        vim.keymap.set("n", "<C-p>", builtin.find_files, { desc = "[S]earch [F]iles" })
-        vim.keymap.set("n", "<leader>ss", builtin.builtin, { desc = "[S]earch [S]elect Telescope" })
-        vim.keymap.set("n", "<leader>sw", builtin.grep_string, { desc = "[S]earch current [W]ord" })
-        vim.keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "[S]earch by [G]rep" })
-        vim.keymap.set("n", "<leader>sd", builtin.diagnostics, { desc = "[S]earch [D]iagnostics" })
-        vim.keymap.set("n", "<leader>sr", builtin.resume, { desc = "[S]earch [R]esume" })
-        vim.keymap.set("n", "<leader>s.", builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-        vim.keymap.set("n", "<leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" })
-        vim.keymap.set("n", "<leader>sn", function()
-          builtin.find_files({ cwd = vim.fn.stdpath("config") })
-        end, { desc = "[S]earch [N]eovim files" })
-        vim.keymap.set("n", "<leader>sv", function()
-          builtin.find_files({
-            cwd = vim.fn.expand("$HOME/vimwiki"),
-            prompt_title = "VimWiki Files",
-          })
-        end, { desc = "[S]earch [V]imWiki" })
-      end,
+      keys = {
+        { "<leader>sh", function() Snacks.picker.help() end,                                          desc = "[S]earch [H]elp" },
+        { "<leader>sk", function() Snacks.picker.keymaps() end,                                       desc = "[S]earch [K]eymaps" },
+        { "<leader>sf", function() Snacks.picker.files() end,                                         desc = "[S]earch [F]iles" },
+        { "<leader>sw", function() Snacks.picker.grep_word() end,                                     desc = "[S]earch current [W]ord" },
+        { "<leader>sg", function() Snacks.picker.grep() end,                                          desc = "[S]earch by [G]rep" },
+        { "<leader>sd", function() Snacks.picker.diagnostics() end,                                   desc = "[S]earch [D]iagnostics" },
+        { "<leader>sr", function() Snacks.picker.resume() end,                                        desc = "[S]earch [R]esume" },
+        { "<leader>s.", function() Snacks.picker.recent() end,                                        desc = '[S]earch Recent Files ("." for repeat)' },
+        { "<leader>sn", function() Snacks.picker.files({ cwd = vim.fn.stdpath("config") }) end,       desc = '[S]earch [N]eovim files' },
+        { "<leader>sv", function() Snacks.picker.files({ cwd = vim.fn.expand("$HOME/vimwiki") }) end, desc = 'VimWiki Files' },
+        { "gd",         function() Snacks.picker.lsp_definitions() end,                               desc = "[G]oto [D]efinition" },
+        { "gr",         function() Snacks.picker.lsp_references() end,                                desc = "[G]oto [R]eferences" },
+        { "gI",         function() Snacks.picker.lsp_implementations() end,                           desc = "[G]oto [I]mplementation" },
+        { "<leader>D",  function() Snacks.picker.lsp_type_definitions() end,                          desc = "Type [D]efinition" },
+        { "<leader>ds", function() Snacks.picker.lsp_symbols() end,                                   desc = "[D]ocument [S]ymbols" },
+        { "<leader>ws", function() Snacks.picker.lsp_workspace_symbols() end,                         desc = "[W]orkspace [S]ymbols" },
+      }
     },
     {
       "nvim-treesitter/nvim-treesitter",
@@ -396,16 +399,6 @@ require("lazy").setup({
               mode = mode or "n"
               vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
             end
-            map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
-            map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
-            map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
-            map("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
-            map("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
-            map(
-              "<leader>ws",
-              require("telescope.builtin").lsp_dynamic_workspace_symbols,
-              "[W]orkspace [S]ymbols"
-            )
             map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
             map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction", { "n", "x" })
             map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
@@ -439,18 +432,11 @@ require("lazy").setup({
                 end,
               })
             end
-
-            if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-              map("<leader>th", function()
-                vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
-              end, "[T]oggle Inlay [H]ints")
-            end
           end,
         })
 
         local capabilities = vim.lsp.protocol.make_client_capabilities()
-        capabilities =
-            vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+        capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
         local servers = lsp_servers
         local ensure_installed = vim.tbl_keys(servers or {})
@@ -596,9 +582,18 @@ require("lazy").setup({
       opts = { signs = false },
     },
     { 'voldikss/vim-floaterm' },
+    {
+      'nvim-lualine/lualine.nvim',
+      opts = {
+        sections = {
+          lualine_x = { 'filesize', 'fileformat', 'filetype' },
+        }
+      },
+      dependencies = { 'nvim-tree/nvim-web-devicons' }
+    },
   },
   install = {},
-  checker = { enabled = true },
+  checker = { enabled = false }, -- to check if there are plugins that need updates
 })
 
 vim.cmd.colorscheme("catppuccin")
