@@ -265,7 +265,10 @@ local lsp_servers = {
         },
         -- Make the server aware of Neovim runtime files
         workspace = {
-          library = vim.api.nvim_get_runtime_file("", true),
+          library = {
+            vim.api.nvim_get_runtime_file("", true),
+            "${3rd}/flash.nvim/types"
+          },
           checkThirdParty = true,
         },
         -- Tell the language server about the neovim API
@@ -315,7 +318,7 @@ require("lazy").setup({
           return {
             CursorLine = {
               bg = u.vary_color({
-                mocha = u.lighten(colors.surface0, 0.30, colors.base),
+                mocha = u.lighten(colors.surface0, 0.64, colors.base),
               }, u.darken(colors.surface0, 0.64, colors.base)),
             },
           }
@@ -342,6 +345,7 @@ require("lazy").setup({
       "folke/snacks.nvim",
       opts = {
         picker = {
+          exclude = { 'node_modules', 'vendor', 'build', 'dist' }
         }
       },
       keys = {
@@ -374,7 +378,7 @@ require("lazy").setup({
           enable = true,
           additional_vim_regex_highlighting = { "ruby" },
         },
-        indent = { enable = true, disable = { "ruby" } },
+        indent = { enable = false, disable = { "ruby" } },
       },
     },
     {
@@ -467,7 +471,7 @@ require("lazy").setup({
     },
     {
       "hrsh7th/nvim-cmp",
-      event = "InsertEnter",
+      -- event = "InsertEnter",
       dependencies = {
         {
           "L3MON4D3/LuaSnip",
@@ -503,6 +507,9 @@ require("lazy").setup({
             expand = function(args)
               luasnip.lsp_expand(args.body)
             end,
+          },
+          performance = {
+            fetching_timeout = 1,
           },
           completion = { completeopt = "menu,menuone,noinsert" },
           mapping = cmp.mapping.preset.insert({
@@ -586,14 +593,30 @@ require("lazy").setup({
       'nvim-lualine/lualine.nvim',
       opts = {
         sections = {
+          lualine_c = { { "filename", path = 1 } },
           lualine_x = { 'filesize', 'fileformat', 'filetype' },
         }
       },
       dependencies = { 'nvim-tree/nvim-web-devicons' }
     },
+    {
+      'lukas-reineke/indent-blankline.nvim',
+      main = 'ibl',
+      opts = {},
+    },
+    {
+      "folke/flash.nvim",
+      event = "VeryLazy",
+      opts = function()
+      end,
+      keys = {
+        { "\\",     mode = { "n", "x", "o" }, function() require("flash").jump() end,       desc = "Flash" },
+        { "<C-\\>", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+      },
+    }
   },
   install = {},
-  checker = { enabled = false }, -- to check if there are plugins that need updates
+  checker = { enabled = false },
 })
 
 vim.cmd.colorscheme("catppuccin")
