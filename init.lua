@@ -26,11 +26,18 @@ vim.keymap.set("n", "<C-d>", "<C-d>zz")
 vim.keymap.set("n", "<C-b>", vim.cmd.OilToggleFloat, { desc = "Open file tree" })
 vim.keymap.set("n", "<Esc>", vim.cmd.nohlsearch, { desc = "Clear highlight" })
 vim.keymap.set("n", "gh", vim.diagnostic.open_float, { desc = "Open diagnostic float window" })
-vim.keymap.set("n", "<leader>cn", vim.cmd.cnext)
-vim.keymap.set("n", "<leader>cp", vim.cmd.cprevious)
 vim.keymap.set("n", "<C-CR>", vim.cmd.Run)
 vim.keymap.set('t', '<leader>t', vim.cmd.FloatermToggle, { desc = 'Toggle Flaterminal' })
 vim.keymap.set('n', '<leader>t', vim.cmd.FloatermToggle, { desc = 'Toggle Flaterminal' })
+vim.keymap.set('n', '<leader>sp', vim.cmd.ProjectSwitcher, { desc = 'Switch Projects' })
+vim.keymap.set("n", "<leader>cn", function()
+  vim.cmd.cnext()
+  vim.cmd.normal("zz")
+end)
+vim.keymap.set("n", "<leader>cp", function()
+  vim.cmd.cprevious()
+  vim.cmd.normal("zz")
+end)
 
 -- NOTE: FUNCTIONS
 
@@ -39,11 +46,45 @@ vim.api.nvim_create_user_command("OilToggleFloat", function()
   oil.toggle_float(oil.get_current_dir())
 end, { desc = "Oil toggle float" })
 
+vim.api.nvim_create_user_command("ProjectSwitcher", function()
+  local projects_directory = "/home/lko/egloo/"
+
+  return require("snacks").picker({
+    title = "Projects",
+
+    finder = function()
+      local items = {}
+
+      local project_directories = vim.fn.readdir(projects_directory,
+        function(entry) return vim.fn.isdirectory(projects_directory .. entry) end)
+      for key, value in pairs(project_directories) do
+        table.insert(items, { idx = key, text = value })
+      end
+
+      return items
+    end,
+
+    format = function(item, _)
+      return { { item.text } }
+    end,
+
+    confirm = function(picker, item)
+      picker:close()
+      local new_directory = projects_directory .. item.text
+      vim.cmd({ cmd = "cd", args = { new_directory } })
+      vim.cmd({ cmd = "Explore", args = { new_directory } })
+      print("Switched to: " .. item.text)
+    end,
+  })
+end, { desc = "Open project picker" })
+
 vim.api.nvim_create_user_command("FormatDisable", function()
+  ---@diagnostic disable-next-line: assign-type-mismatch
   require("conform").setup({ format_on_save = false })
 end, { desc = "Disable formatting" })
 
 vim.api.nvim_create_user_command("FormatEnable", function()
+  ---@diagnostic disable-next-line: assign-type-mismatch
   require("conform").setup({ format_on_save = true })
 end, { desc = "Enable formatting" })
 
@@ -67,6 +108,8 @@ vim.api.nvim_create_user_command("Run", function()
     vim.cmd("FloatermNew --autoclose=0 bash %")
   elseif vim.bo.filetype == "c" then
     vim.cmd("FloatermNew --autoclose=0 gcc % -o %< && ./%<")
+  elseif vim.bo.filetype == "lua" then
+    vim.cmd("FloatermNew --autoclose=0 lua %")
   else
     print("Filetype not supported")
   end
@@ -156,7 +199,6 @@ local lsp_servers = {
       'astro',
     },
   },
-  tailwindcss = {},
   intelephense = {
     root_dir = function()
       return vim.fn.getcwd()
@@ -253,32 +295,7 @@ local lsp_servers = {
       },
     },
   },
-  lua_ls = {
-    settings = {
-      Lua = {
-        runtime = {
-          -- Tell the language server which version of Lua you're using
-          version = "LuaJIT",
-        },
-        diagnostics = {
-          globals = { "vim", "Snacks" },
-        },
-        -- Make the server aware of Neovim runtime files
-        workspace = {
-          library = {
-            vim.api.nvim_get_runtime_file("", true),
-            "${3rd}/flash.nvim/types"
-          },
-          checkThirdParty = true,
-        },
-        -- Tell the language server about the neovim API
-        completion = {
-          callSnippet = "Replace",
-        },
-      },
-
-    },
-  },
+  lua_ls = {},
 }
 
 -- NOTE: PLUGINS
@@ -299,6 +316,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+---@diagnostic disable-next-line: missing-fields
 require("lazy").setup({
   spec = {
     {
@@ -345,7 +363,12 @@ require("lazy").setup({
       "folke/snacks.nvim",
       opts = {
         picker = {
-          exclude = { 'node_modules', 'vendor', 'build', 'dist' }
+          exclude = { 'node_modules', 'vendor', 'build', 'dist' },
+          formatters = {
+            file = {
+              truncate = 10000
+            }
+          },
         }
       },
       keys = {
@@ -357,6 +380,7 @@ require("lazy").setup({
         { "<leader>sd", function() Snacks.picker.diagnostics() end,                                   desc = "[S]earch [D]iagnostics" },
         { "<leader>sr", function() Snacks.picker.resume() end,                                        desc = "[S]earch [R]esume" },
         { "<leader>s.", function() Snacks.picker.recent() end,                                        desc = '[S]earch Recent Files ("." for repeat)' },
+        ---@diagnostic disable-next-line: assign-type-mismatch
         { "<leader>sn", function() Snacks.picker.files({ cwd = vim.fn.stdpath("config") }) end,       desc = '[S]earch [N]eovim files' },
         { "<leader>sv", function() Snacks.picker.files({ cwd = vim.fn.expand("$HOME/vimwiki") }) end, desc = 'VimWiki Files' },
         { "gd",         function() Snacks.picker.lsp_definitions() end,                               desc = "[G]oto [D]efinition" },
@@ -372,7 +396,6 @@ require("lazy").setup({
       build = ":TSUpdate",
       main = "nvim-treesitter.configs",
       opts = {
-        ensure_installed = {},
         auto_install = true,
         highlight = {
           enable = true,
@@ -448,6 +471,8 @@ require("lazy").setup({
         require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
         require("mason-lspconfig").setup({
+          ensure_installed = {},
+          automatic_installation = false,
           handlers = {
             function(server_name)
               local server = servers[server_name] or {}
@@ -471,7 +496,7 @@ require("lazy").setup({
     },
     {
       "hrsh7th/nvim-cmp",
-      -- event = "InsertEnter",
+      event = "InsertEnter",
       dependencies = {
         {
           "L3MON4D3/LuaSnip",
@@ -494,6 +519,7 @@ require("lazy").setup({
         },
         "saadparwaiz1/cmp_luasnip",
         "hrsh7th/cmp-nvim-lsp",
+        "hrsh7th/cmp-nvim-lua",
         "hrsh7th/cmp-path",
       },
       config = function()
@@ -508,6 +534,7 @@ require("lazy").setup({
               luasnip.lsp_expand(args.body)
             end,
           },
+          ---@diagnostic disable-next-line: missing-fields
           performance = {
             fetching_timeout = 1,
           },
@@ -518,7 +545,7 @@ require("lazy").setup({
             ["<C-b>"] = cmp.mapping.scroll_docs(-4),
             ["<C-f>"] = cmp.mapping.scroll_docs(4),
             ["<tab>"] = cmp.mapping.confirm({ select = true }),
-            ["<C-x>"] = cmp.mapping.close({ select = true }),
+            ["<C-x>"] = cmp.mapping.close(),
             ["<C-Space>"] = cmp.mapping.complete({}),
             ["<C-l>"] = cmp.mapping(function()
               if luasnip.expand_or_locally_jumpable() then
@@ -537,8 +564,9 @@ require("lazy").setup({
             end, { "i", "s" }),
           }),
           sources = {
-            { name = "lazydev", group_index = 0 },
+            { name = "lazydev",                group_index = 0 },
             { name = "nvim_lsp" },
+            { name = 'nvim_lsp_signature_help' },
             { name = "luasnip" },
             { name = "path" },
           },
@@ -608,12 +636,44 @@ require("lazy").setup({
       "folke/flash.nvim",
       event = "VeryLazy",
       opts = function()
+        vim.api.nvim_set_hl(0, 'FlashLabel', { fg = "#ffff00" })
+        return {
+          modes = {
+            char = {
+              enabled = false,
+            }
+          }
+        }
       end,
       keys = {
         { "\\",     mode = { "n", "x", "o" }, function() require("flash").jump() end,       desc = "Flash" },
         { "<C-\\>", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
       },
-    }
+    },
+    { "itchyny/vim-qfedit" },
+    {
+      'MeanderingProgrammer/render-markdown.nvim',
+      dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
+      opts = function()
+        vim.treesitter.language.register('markdown', 'vimwiki')
+        return {
+          file_types = { "markdown", "vimwiki" },
+          render_modes = true,
+          latex = { enabled = false },
+        }
+      end,
+    },
+    {
+      "folke/lazydev.nvim",
+      ft = "lua", -- only load on lua files
+      opts = {
+        library = {
+          -- See the configuration section for more details
+          -- Load luvit types when the `vim.uv` word is found
+          { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+        },
+      },
+    },
   },
   install = {},
   checker = { enabled = false },
