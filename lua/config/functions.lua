@@ -49,6 +49,10 @@ vim.api.nvim_create_user_command("FormatEnable", function()
     require("conform").setup({ format_on_save = true })
 end, { desc = "Enable formatting" })
 
+vim.api.nvim_create_user_command("Won", function(command)
+    vim.cmd("FloatermNew --autoclose=0 won " .. command.args)
+end, { desc = "Working On...", nargs = 1 })
+
 vim.api.nvim_create_user_command("Run", function()
     if vim.bo.buftype ~= "" then
         print("Cannot run: current buffer is not writable")
@@ -59,20 +63,54 @@ vim.api.nvim_create_user_command("Run", function()
         vim.cmd("write")
     end
 
-    if vim.bo.filetype == "python" then
-        vim.cmd("FloatermNew --autoclose=0 python3 %")
-    elseif vim.bo.filetype == "javascript" then
-        vim.cmd("FloatermNew --autoclose=0 node %")
-    elseif vim.bo.filetype == "typescript" then
-        vim.cmd("FloatermNew --autoclose=0 tsc % && node %:r.js")
-    elseif vim.bo.filetype == "sh" then
-        vim.cmd("FloatermNew --autoclose=0 bash %")
-    elseif vim.bo.filetype == "c" then
-        vim.cmd("FloatermNew --autoclose=0 gcc % -o %< && ./%<")
-    elseif vim.bo.filetype == "lua" then
-        vim.cmd("FloatermNew --autoclose=0 lua %")
-    else
-        print("Filetype not supported")
+    local languages = {
+        {
+            language = "python",
+            command = "python3 %"
+        },
+        {
+            language = "javascript",
+            command = "node %"
+        },
+        {
+            language = "typescript",
+            command = "tsc % && node %:r.js"
+        },
+        {
+            language = "sh",
+            command = "bash %"
+        },
+        {
+            language = "c",
+            command = "gcc % -o %< && ./%<"
+        },
+        {
+            language = "lua",
+            command = "lua %"
+        },
+        {
+            language = "php",
+            command = "php %"
+        },
+        {
+            language = "go",
+            command = function()
+                local filename = vim.fs.basename(vim.fn.expand("%"))
+                local is_test_file = string.match(filename, "^.*_test.go$")
+
+                if is_test_file then return "go test" end
+
+                return "go run %"
+            end
+        },
+    }
+
+    for _, language in ipairs(languages) do
+        if language.language == vim.bo.filetype then
+            vim.cmd("FloatermNew --autoclose=0 " .. utils.auto_call(language.command))
+        else
+            print("Filetype not supported")
+        end
     end
 end, { desc = "Run file" })
 
@@ -118,17 +156,17 @@ vim.api.nvim_create_user_command("HexToRgb", function()
             local g = tonumber(hex:sub(3, 4), 16)
             local b = tonumber(hex:sub(5, 6), 16)
             local a = tonumber(hex:sub(7, 8), 16) / 255
-            return string.format("rgba(%d, %d, %d, %.2f)", r, g, b, a)
+            return string.format("rgb(%d %d %d / %.2f)", r, g, b, a)
         elseif #hex == 6 then -- #RRGGBB
             local r = tonumber(hex:sub(1, 2), 16)
             local g = tonumber(hex:sub(3, 4), 16)
             local b = tonumber(hex:sub(5, 6), 16)
-            return string.format("rgb(%d, %d, %d)", r, g, b)
+            return string.format("rgb(%d %d %d / 1)", r, g, b)
         elseif #hex == 3 then -- #RGB
             local r = tonumber(hex:sub(1, 1) .. hex:sub(1, 1), 16)
             local g = tonumber(hex:sub(2, 2) .. hex:sub(2, 2), 16)
             local b = tonumber(hex:sub(3, 3) .. hex:sub(3, 3), 16)
-            return string.format("rgb(%d, %d, %d)", r, g, b)
+            return string.format("rgb(%d %d %d / 1)", r, g, b)
         end
         return nil
     end
@@ -158,6 +196,65 @@ vim.api.nvim_create_user_command("HexToRgb", function()
         print("No hex color found in current line")
     end
 end, { desc = "Convert Hex color to RGB" })
+
+vim.api.nvim_create_user_command("Type", function()
+    local is_js_file = vim.bo.filetype == "javascript"
+    if not is_js_file then return end
+
+    local params = vim.lsp.util.make_position_params(0, 'utf-8')
+    local clients_array = vim.lsp.buf_request_sync(0, "textDocument/hover", params, 500)
+    local result = nil
+
+    if not clients_array then
+        vim.notify("No clients detected")
+        return
+    end
+
+    for index, client_result in pairs(clients_array) do
+        local client = vim.lsp.get_client_by_id(index)
+        if client and client.name and client.name == "ts_ls" then
+            if not client_result.result then
+                vim.notify("No result")
+                return
+            end
+            result = client_result.result
+            break
+        end
+    end
+
+    if
+        result and
+        result.contents and
+        result.contents.kind and
+        result.contents.kind == "markdown" and
+        result.contents.value
+    then
+        local value = result.contents.value
+        local is_function = string.match(value, "```typescript%sfunction")
+
+        if is_function then
+            local lines = { "/**" }
+            local function_name, args = string.match(value, "```typescript%sfunction ([a-zA-Z0-9_]+)%(([^)]*)")
+            table.insert(lines, " * " .. function_name)
+            table.insert(lines, " *")
+            if args then
+                local single_args = utils.split_string(args, ",")
+                for _, arg in ipairs(single_args) do
+                    local trimmed = string.gsub(arg, "%s+", "")
+                    local variable_name = utils.split_string(trimmed, ":")[1]
+                    table.insert(lines, " * @param {any} " .. variable_name)
+                end
+            end
+            table.insert(lines, " * @returns void")
+            table.insert(lines, " */")
+            utils.write_lines(lines)
+        else
+            local ts_type = string.match(value, "```typescript%s+.-: (.-)\n")
+            local js_doc = "/** @type {" .. ts_type .. "} */"
+            utils.write_lines({ js_doc })
+        end
+    end
+end, { desc = "Writes the JSDoc of the variable on top of it" })
 
 -- NOTE: AUTOCMD FUNCTIONS
 

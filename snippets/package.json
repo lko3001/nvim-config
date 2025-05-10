@@ -1,44 +1,45 @@
 {
-  "name": "snips",
-  "engines": {
-    "vscode": "^1.11.0"
-  },
-  "contributes": {
-    "snippets": [
-      {
-        "language": [
-          "css",
-          "scss",
-          "astro",
-          "vue"
-        ],
-        "path": "./css.json"
-      },
-      {
-        "language": [
-          "php",
-          "html",
-          "astro",
-          "vue"
-        ],
-        "path": "./html.json"
-      },
-      {
-        "language": [
-          "php"
-        ],
-        "path": "./php.json"
-      },
-      {
-        "language": [
-          "javascript",
-          "typescript",
-          "javascriptreact",
-          "typescriptreact",
-          "astro"
-        ],
-        "path": "./js.json"
-      }
-    ]
-  }
+    "name": "snips",
+    "engines": {
+        "vscode": "^1.11.0"
+    },
+    "contributes": {
+        "snippets": [
+            {
+                "language": [
+                    "css",
+                    "scss",
+                    "astro",
+                    "vue"
+                ],
+                "path": "./css.json"
+            },
+            {
+                "language": [
+                    "php",
+                    "html",
+                    "astro",
+                    "vue"
+                ],
+                "path": "./html.json"
+            },
+            {
+                "language": [
+                    "php"
+                ],
+                "path": "./php.json"
+            },
+            {
+                "language": [
+                    "javascript",
+                    "typescript",
+                    "javascriptreact",
+                    "typescriptreact",
+                    "astro",
+                    "vue"
+                ],
+                "path": "./js.json"
+            }
+        ]
+    }
 }

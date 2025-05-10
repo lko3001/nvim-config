@@ -47,7 +47,9 @@
   },
   "php image": {
     "prefix": "phpimg",
-    "body": ["<?php echo wp_get_attachment_image(${1}['id'], 'full'); ?>"],
+    "body": [
+      "<?php echo wp_get_attachment_image(${1}['id'], 'full', false, ['loading' => 'lazy']); ?>"
+    ],
     "description": "<? echo wp_get_attachemnt_image ... ?>"
   }
 }

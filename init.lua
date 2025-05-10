@@ -2,16 +2,19 @@ local mappings = require("config.mappings")
 local functions = require("config.functions")
 
 local formatters = {
-    shfmt = { "bash", stop_after_first = true },
-    lua = { "stylua", stop_after_first = true },
-    html = { "prettierd", stop_after_first = true },
-    vue = { "prettierd", stop_after_first = true },
-    css = { "prettierd", stop_after_first = true },
-    javascript = { "prettierd", stop_after_first = true },
-    typescript = { "prettierd", stop_after_first = true },
-    json = { "prettierd", stop_after_first = true },
-    python = { "yapf", stop_after_first = true },
+    blade = { "blade-formatter", stop_after_first = true },
     c = { "clang-format", stop_after_first = true },
+    css = { "prettierd", stop_after_first = true },
+    go = { "gofmt", stop_after_first = true },
+    html = { "prettierd", stop_after_first = true },
+    javascript = { "prettierd", stop_after_first = true },
+    json = { "prettierd", stop_after_first = true },
+    jsonc = { "prettierd", stop_after_first = true },
+    lua = { "stylua", stop_after_first = true },
+    python = { "yapf", stop_after_first = true },
+    shfmt = { "bash", stop_after_first = true },
+    typescript = { "prettierd", stop_after_first = true },
+    vue = { "prettierd", stop_after_first = true },
 }
 
 local custom_surrounds = {
@@ -29,6 +32,7 @@ local custom_surrounds = {
 
 local lsp_servers = function(vue_language_server_path)
     return {
+        gopls = {},
         volar = {},
         ts_ls = {
             init_options = {
@@ -46,20 +50,30 @@ local lsp_servers = function(vue_language_server_path)
             settings = {
                 scss = {
                     lint = {
-                        unknownAtRules = "ignore"
-                    }
+                        unknownAtRules = "ignore",
+                        compatibleVendorPrefixes = "warning",
+                        duplicateProperties = "error",
+                    },
+                },
+                css = {
+                    lint = {
+                        compatibleVendorPrefixes = "warning",
+                        duplicateProperties = "error",
+                    },
                 }
             }
         },
         html = {},
         emmet_language_server = {
             filetypes = {
+                "blade",
                 "vue",
                 'html',
                 'typescriptreact',
                 'javascriptreact',
                 'javascript',
                 'php',
+                'blade',
                 'typescript',
                 'javascript.jsx',
                 'typescript.tsx',
@@ -81,12 +95,88 @@ local lsp_servers = function(vue_language_server_path)
                         clearCache = true
                     },
                     stubs = {
+                        "Core",
+                        "FFI",
+                        "PDO",
+                        "Phar",
+                        "Reflection",
+                        "SPL",
+                        "SimpleXML",
+                        "Zend OPcache",
+                        "acf-pro",
+                        "apache",
+                        "bcmath",
+                        "bz2",
+                        "calendar",
+                        "com_dotnet",
+                        "ctype",
+                        "curl",
+                        "date",
+                        "dba",
+                        "dom",
+                        "enchant",
+                        "exif",
+                        "fileinfo",
+                        "filter",
+                        "fpm",
+                        "ftp",
+                        "gd",
+                        "gettext",
+                        "gmp",
+                        "hash",
+                        "iconv",
+                        "imap",
+                        "intl",
+                        "json",
+                        "ldap",
+                        "libxml",
+                        "mbstring",
+                        "mysqli",
+                        "oci8",
+                        "openssl",
+                        "pcntl",
+                        "pcre",
+                        "pdo_mysql",
+                        "posix",
+                        "pspell",
+                        "readline",
+                        "session",
+                        "shmop",
+                        "snmp",
+                        "soap",
+                        "sockets",
+                        "sodium",
+                        "sqlite3",
+                        "standard",
+                        "superglobals",
+                        "sysvmsg",
+                        "sysvsem",
+                        "sysvshm",
+                        "tidy",
+                        "tokenizer",
+                        "woocommerce",
+                        "wordpress-globals",
+                        "wp-cli",
+                        "xml",
+                        "xmlreader",
+                        "xmlrpc",
+                        "xmlwriter",
+                        "xsl",
+                        "zip",
+                        "zlib",
+                        'Core',
+                        'FFI',
+                        'PDO',
+                        'Phar',
+                        'Reflection',
+                        'SPL',
+                        'SimpleXML',
+                        'Zend OPcache',
                         'apache',
                         'bcmath',
                         'bz2',
                         'calendar',
                         'com_dotnet',
-                        'Core',
                         'ctype',
                         'curl',
                         'date',
@@ -94,7 +184,6 @@ local lsp_servers = function(vue_language_server_path)
                         'dom',
                         'enchant',
                         'exif',
-                        'FFI',
                         'fileinfo',
                         'filter',
                         'fpm',
@@ -117,25 +206,20 @@ local lsp_servers = function(vue_language_server_path)
                         'openssl',
                         'pcntl',
                         'pcre',
-                        'PDO',
                         'pdo_ibm',
                         'pdo_mysql',
                         'pdo_pgsql',
                         'pdo_sqlite',
                         'pgsql',
-                        'Phar',
                         'posix',
                         'pspell',
                         'readline',
-                        'Reflection',
                         'session',
                         'shmop',
-                        'SimpleXML',
                         'snmp',
                         'soap',
                         'sockets',
                         'sodium',
-                        'SPL',
                         'sqlite3',
                         'standard',
                         'superglobals',
@@ -144,19 +228,14 @@ local lsp_servers = function(vue_language_server_path)
                         'sysvshm',
                         'tidy',
                         'tokenizer',
+                        'wordpress',
                         'xml',
                         'xmlreader',
                         'xmlrpc',
                         'xmlwriter',
                         'xsl',
-                        'Zend OPcache',
                         'zip',
                         'zlib',
-                        'wordpress',
-                        "woocommerce",
-                        "acf-pro",
-                        "wordpress-globals",
-                        "wp-cli",
                         vim.fn.expand('~/.config/composer/vendor/php-stubs/acf-pro-stubs/'),
                         vim.fn.expand('~/.config/composer/vendor/php-stubs/woocommerce-stubs/'),
                         vim.fn.expand('~/.config/composer/vendor/php-stubs/wordpress-stubs/'),
@@ -199,6 +278,7 @@ require("lazy").setup({
             name = "catppuccin",
             priority = 1000,
             opts = {
+                floating_border = "on",
                 color_overrides = {
                     mocha = {
                         base = "#000000",
@@ -236,6 +316,8 @@ require("lazy").setup({
         },
         {
             "folke/snacks.nvim",
+            ---@module "snacks"
+            ---@type snacks.Config
             opts = {
                 picker = {
                     exclude = { 'node_modules', 'vendor', 'build', 'dist' },
@@ -244,12 +326,15 @@ require("lazy").setup({
                             truncate = 10000
                         }
                     },
+                },
+                notifier = {
+                    top_down = false
                 }
             },
             keys = {
                 { "<leader>sh", function() Snacks.picker.help() end,                                          desc = "[S]earch [H]elp" },
                 { "<leader>sk", function() Snacks.picker.keymaps() end,                                       desc = "[S]earch [K]eymaps" },
-                { "<leader>sf", function() Snacks.picker.files() end,                                         desc = "[S]earch [F]iles" },
+                { "<leader>sf", function() Snacks.picker.files({ hidden = true }) end,                        desc = "[S]earch [F]iles" },
                 { "<leader>sw", function() Snacks.picker.grep_word() end,                                     desc = "[S]earch current [W]ord",               mode = { "n", "x" } },
                 { "<leader>sg", function() Snacks.picker.grep() end,                                          desc = "[S]earch by [G]rep" },
                 { "<leader>sd", function() Snacks.picker.diagnostics() end,                                   desc = "[S]earch [D]iagnostics" },
@@ -276,7 +361,7 @@ require("lazy").setup({
                     enable = true,
                     additional_vim_regex_highlighting = { "ruby" },
                 },
-                indent = { enable = false, disable = { "ruby" } },
+                indent = { enable = true, disable = { "ruby", "html" } },
             },
         },
         {
@@ -292,6 +377,7 @@ require("lazy").setup({
             config = function()
                 vim.diagnostic.config({
                     update_in_insert = true,
+                    virtual_text = true
                 })
 
                 vim.api.nvim_create_autocmd("LspAttach", {
@@ -362,13 +448,14 @@ require("lazy").setup({
                     },
                 })
             end,
+
         },
         {
             "stevearc/conform.nvim",
             opts = {
                 formatters_by_ft = formatters,
                 format_on_save = {
-                    timeout_ms = 500,
+                    timeout_ms = 1000,
                     lsp_format = "fallback",
                 },
             },
@@ -405,6 +492,7 @@ require("lazy").setup({
                 -- See `:help cmp`
                 local cmp = require("cmp")
                 local luasnip = require("luasnip")
+
                 luasnip.config.setup({})
 
                 cmp.setup({
@@ -448,6 +536,20 @@ require("lazy").setup({
                         { name = 'nvim_lsp_signature_help' },
                         { name = "luasnip" },
                         { name = "path" },
+                    },
+                    border = {
+                        completion = true,
+                        documentation = true
+                    },
+                    window = {
+                        completion = {
+                            border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
+                            winhighlight = "Normal:CmpPmenu,FloatBorder:CmpBorder,CursorLine:PmenuSel,Search:None",
+                        },
+                        documentation = {
+                            border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
+                            winhighlight = "Normal:CmpPmenu,FloatBorder:CmpBorder,CursorLine:PmenuSel,Search:None",
+                        },
                     },
                 })
             end,
@@ -539,6 +641,9 @@ require("lazy").setup({
                     file_types = { "markdown", "vimwiki" },
                     render_modes = true,
                     latex = { enabled = false },
+                    code = {
+                        border = "thick"
+                    }
                 }
             end,
         },
@@ -547,11 +652,49 @@ require("lazy").setup({
             ft = "lua", -- only load on lua files
             opts = {
                 library = {
-                    -- See the configuration section for more details
-                    -- Load luvit types when the `vim.uv` word is found
                     { path = "${3rd}/luv/library", words = { "vim%.uv" } },
                 },
             },
+        },
+        {
+            "lko3001/px2rem.nvim",
+            dependencies = { "hrsh7th/nvim-cmp" },
+            ---@module "px2rem.nvim"
+            ---@type PxToRemConfig
+            opts = {},
+            ft = { "css", "scss" }
+        },
+        {
+            "greggh/claude-code.nvim",
+            dependencies = {
+                "nvim-lua/plenary.nvim", -- Required for git operations
+            },
+            config = function()
+                require("claude-code").setup()
+            end
+        },
+        { "adalessa/laravel.nvim" },
+        {
+            'ricardoramirezr/blade-nav.nvim',
+            dependencies = {                  -- totally optional
+                'hrsh7th/nvim-cmp',           -- if using nvim-cmp
+            },
+            ft = { 'blade', 'php' },          -- optional, improves startup time
+            opts = {
+                close_tag_on_complete = true, -- default: true
+            },
+        },
+        {
+            "kndndrj/nvim-dbee",
+            dependencies = {
+                "MunifTanjim/nui.nvim",
+            },
+            build = function()
+                require("dbee").install()
+            end,
+            config = function()
+                require("dbee").setup()
+            end,
         },
     },
     install = {},
