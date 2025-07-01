@@ -5,6 +5,13 @@ vim.api.nvim_create_user_command("OilToggleFloat", function()
     oil.toggle_float(oil.get_current_dir())
 end, { desc = "Oil toggle float" })
 
+vim.api.nvim_create_user_command("Test", function()
+    local selected_lines = utils.get_visual_selection()
+    local sum = 0
+
+    if not selected_lines then return sum end
+end, { desc = "Sum numbers", range = true })
+
 vim.api.nvim_create_user_command("ProjectSwitcher", function()
     local projects_directory = "/home/lko/egloo/"
 
@@ -44,6 +51,7 @@ vim.api.nvim_create_user_command("FormatDisable", function()
     require("conform").setup({ format_on_save = false })
 end, { desc = "Disable formatting" })
 
+
 vim.api.nvim_create_user_command("FormatEnable", function()
     ---@diagnostic disable-next-line: assign-type-mismatch
     require("conform").setup({ format_on_save = true })
@@ -74,7 +82,7 @@ vim.api.nvim_create_user_command("Run", function()
         },
         {
             language = "typescript",
-            command = "tsc % && node %:r.js"
+            command = "node %"
         },
         {
             language = "sh",
@@ -119,15 +127,20 @@ vim.api.nvim_create_user_command("FontGenerator", function(details)
     local font_size_px = tonumber(args[1])
     local line_height_px = tonumber(args[2])
     local letter_spacing = tonumber(args[3])
+    local class_name = args[4]
 
     if not font_size_px then
         error("You need to provide a font size value")
         return
     end
 
+    if not class_name then
+        class_name = "fs-" .. font_size_px
+    end
+
     local lines = {}
 
-    table.insert(lines, ".fs-" .. font_size_px .. " {")
+    table.insert(lines, "." .. class_name .. " {")
 
     table.insert(lines, "\t font-size: " .. font_size_px / 16 .. "rem;")
 
@@ -196,6 +209,8 @@ vim.api.nvim_create_user_command("HexToRgb", function()
         print("No hex color found in current line")
     end
 end, { desc = "Convert Hex color to RGB" })
+
+
 
 vim.api.nvim_create_user_command("Type", function()
     local is_js_file = vim.bo.filetype == "javascript"

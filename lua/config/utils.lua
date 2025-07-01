@@ -22,4 +22,11 @@ function M.auto_call(variable)
     return variable
 end
 
+function M.get_visual_selection()
+    local s_start = vim.fn.getpos("'<")
+    local s_end = vim.fn.getpos("'>")
+    local lines = vim.api.nvim_buf_get_lines(0, s_start[2] - 1, s_end[2], false)
+    return lines
+end
+
 return M

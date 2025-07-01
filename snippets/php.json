@@ -1,55 +1,61 @@
 {
-  "template": {
-    "prefix": "Template",
-    "body": [
-      "<?php",
-      "/* Template name: ${1} */",
-      "get_header();",
-      "?>",
-      "",
-      "${2}",
-      "",
-      "<?php get_footer() ?>"
-    ],
-    "description": "create rows"
-  },
-  "acfa": {
-    "prefix": "ACF <a>",
-    "body": [
-      "<a href=\"<?php echo ${1}['url'] ?>\" target=\"<?php echo ${1}['target'] ?: '_self' ?>\"><?php echo ${1}['title'] ?></a>"
-    ],
-    "description": "ACF <a>"
-  },
-  "<?php ... ?>": {
-    "prefix": "php",
-    "body": ["<?php ${1} ?>"],
-    "description": "<?php ?>"
-  },
-  "<?php echo ... ?>": {
-    "prefix": "phpe",
-    "body": ["<?php echo ${1} ?>"],
-    "description": "<?php echo ... ?>"
-  },
-  "<?php echo eg_clean(...) ?>": {
-    "prefix": "phpec",
-    "body": ["<?php echo eg_clean(${1}) ?>"],
-    "description": "<?php echo eg_clean(...) ?>"
-  },
-  "php if": {
-    "prefix": "phpif",
-    "body": ["<?php if(${1}): ?>", "${2}", "<?php endif; ?>"],
-    "description": "<? if ... ?>"
-  },
-  "php foreach": {
-    "prefix": "phpforeach",
-    "body": ["<?php foreach(${1} as ${2}): ?>", "${3}", "<?php endforeach; ?>"],
-    "description": "<? if ... ?>"
-  },
-  "php image": {
-    "prefix": "phpimg",
-    "body": [
-      "<?php echo wp_get_attachment_image(${1}['id'], 'full', false, ['loading' => 'lazy']); ?>"
-    ],
-    "description": "<? echo wp_get_attachemnt_image ... ?>"
-  }
+    "template": {
+        "prefix": "Template",
+        "body": [
+            "<?php",
+            "/* Template name: ${1} */",
+            "get_header();",
+            "?>",
+            "",
+            "${2}",
+            "",
+            "<?php get_footer() ?>"
+        ],
+        "description": "create rows"
+    },
+    "acfa": {
+        "prefix": "ACF <a>",
+        "body": [
+            "<a href=\"<?php echo ${1}['url'] ?>\" target=\"<?php echo ${1}['target'] ?: '_self' ?>\">",
+            "\t<?php echo ${1}['title'] ?>",
+            "</a>"
+        ],
+        "description": "ACF <a>"
+    },
+    "<?php ... ?>": {
+        "prefix": "php",
+        "body": ["<?php ${1} ?>"],
+        "description": "<?php ?>"
+    },
+    "<?php echo ... ?>": {
+        "prefix": "phpe",
+        "body": ["<?php echo ${1} ?>"],
+        "description": "<?php echo ... ?>"
+    },
+    "<?php echo eg_clean(...) ?>": {
+        "prefix": "phpec",
+        "body": ["<?php echo eg_clean(${1}) ?>"],
+        "description": "<?php echo eg_clean(...) ?>"
+    },
+    "php if": {
+        "prefix": "phpif",
+        "body": ["<?php if(${1}): ?>", "${2}", "<?php endif; ?>"],
+        "description": "<? if ... ?>"
+    },
+    "php foreach": {
+        "prefix": "phpforeach",
+        "body": [
+            "<?php foreach(${1} as ${2}): ?>",
+            "${3}",
+            "<?php endforeach; ?>"
+        ],
+        "description": "<? if ... ?>"
+    },
+    "php image": {
+        "prefix": "phpimg",
+        "body": [
+            "<?php echo wp_get_attachment_image(${1}['id'], 'full', false, ['loading' => 'lazy']); ?>"
+        ],
+        "description": "<? echo wp_get_attachemnt_image ... ?>"
+    }
 }

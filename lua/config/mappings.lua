@@ -16,6 +16,7 @@ vim.opt.splitright = true
 vim.opt.splitbelow = true
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 vim.opt.inccommand = "split"
+vim.opt.guicursor = "n-v-c:block-Cursor/lCursor,i-ci-ve:ver25-Cursor/lCursor,r-cr:hor20,o:hor50"
 
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
@@ -34,7 +35,16 @@ vim.keymap.set("n", "<leader>cp", function()
     vim.cmd.cprevious()
     vim.cmd.normal("zz")
 end)
-vim.keymap.set("n", "gh", function() vim.diagnostic.open_float({ border = "rounded" }) end,
-    { desc = "Open diagnostic float window" })
-vim.keymap.set("n", "K", function() vim.lsp.buf.hover({ border = "rounded" }) end,
-    { desc = "Open diagnostic float window" })
+
+vim.keymap.set(
+    "n",
+    "gh",
+    function() vim.diagnostic.open_float({ border = "rounded" }) end,
+    { desc = "Open diagnostic float window" }
+)
+vim.keymap.set(
+    "n",
+    "K",
+    function() vim.lsp.buf.hover({ border = "rounded" }) end,
+    { desc = "Open diagnostic float window" }
+)

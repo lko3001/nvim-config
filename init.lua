@@ -33,7 +33,6 @@ local custom_surrounds = {
 local lsp_servers = function(vue_language_server_path)
     return {
         gopls = {},
-        volar = {},
         ts_ls = {
             init_options = {
                 plugins = {
@@ -52,13 +51,11 @@ local lsp_servers = function(vue_language_server_path)
                     lint = {
                         unknownAtRules = "ignore",
                         compatibleVendorPrefixes = "warning",
-                        duplicateProperties = "error",
                     },
                 },
                 css = {
                     lint = {
                         compatibleVendorPrefixes = "warning",
-                        duplicateProperties = "error",
                     },
                 }
             }
@@ -88,11 +85,17 @@ local lsp_servers = function(vue_language_server_path)
             end,
             settings = {
                 init_options = {
-                    clearCache = true
+                    clearCache = true,
                 },
                 intelephense = {
-                    init_options = {
-                        clearCache = true
+                    diagnostics = {
+                        undefinedProperties = true,
+                        undefinedVariables = true,
+                    },
+                    completion = {
+                        insertUseDeclaration = true,
+                        fullyQualifyGlobalConstantsAndFunctions = false,
+                        suggestObjectOperatorStaticMethods = true,
                     },
                     stubs = {
                         "Core",
@@ -294,9 +297,19 @@ require("lazy").setup({
                                 mocha = u.lighten(colors.surface0, 0.64, colors.base),
                             }, u.darken(colors.surface0, 0.64, colors.base)),
                         },
+                        CursorLineNr = {
+                            fg = colors.text, -- Make current line number stand out clearly
+                            style = { "bold" },
+                        },
+                        LineNr = {
+                            fg = colors.text, -- Make line numbers brighter
+                        },
                     }
                 end,
             },
+        },
+        {
+            "rktjmp/lush.nvim",
         },
         {
             "stevearc/oil.nvim",
@@ -428,25 +441,25 @@ require("lazy").setup({
 
 
                 local mason_registry = require('mason-registry')
-                local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() ..
-                    '/node_modules/@vue/language-server'
+                local vue_language_server_path = vim.fn.expand(
+                    "$MASON/packages/vue-language-server/node_modules/@vue/typescript-plugin")
                 local servers = lsp_servers(vue_language_server_path)
                 local ensure_installed = vim.tbl_keys(servers or {})
                 vim.list_extend(ensure_installed, {})
                 require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
                 require("mason-lspconfig").setup({
-                    ensure_installed = {},
+                    ensure_installed = vim.tbl_keys(servers or {}),
                     automatic_installation = false,
-                    handlers = {
-                        function(server_name)
-                            local server = servers[server_name] or {}
-                            server.capabilities =
-                                vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-                            require("lspconfig")[server_name].setup(server)
-                        end,
-                    },
+                    automatic_enable = false
                 })
+
+                -- Manually configure each server
+                for server_name, server_config in pairs(servers) do
+                    server_config.capabilities = vim.tbl_deep_extend("force", {}, capabilities,
+                        server_config.capabilities or {})
+                    require("lspconfig")[server_name].setup(server_config)
+                end
             end,
 
         },
@@ -604,6 +617,10 @@ require("lazy").setup({
                 sections = {
                     lualine_c = { { "filename", path = 1 } },
                     lualine_x = { 'filesize', 'fileformat', 'filetype' },
+                },
+                inactive_sections = {
+                    lualine_c = { { "filename", path = 1 } },
+                    lualine_x = { 'filesize', 'fileformat', 'filetype' },
                 }
             },
             dependencies = { 'nvim-tree/nvim-web-devicons' }
@@ -611,6 +628,7 @@ require("lazy").setup({
         {
             'lukas-reineke/indent-blankline.nvim',
             main = 'ibl',
+            enabled = false,
             opts = {},
         },
         {
